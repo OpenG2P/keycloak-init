@@ -64,8 +64,8 @@ def create_client(base_url, realm, token, client_config):
     # 2. Configure Mappers
     configure_mappers(base_url, realm, token, client_uuid, client_id)
 
-    # 3. Remove "roles" scope
-    configure_scopes(base_url, realm, token, client_uuid)
+    # 3. Retain "roles" scope (Logic to remove it is now removed)
+    # configure_scopes(base_url, realm, token, client_uuid)
 
     print(f"Client {client_id} processed successfully.")
 
@@ -188,6 +188,8 @@ def main():
             "publicClient": False, # Client authentication: On
             "standardFlowEnabled": True, # Standard flow
             "serviceAccountsEnabled": True, # Service accounts roles
+            "directAccessGrantsEnabled": False, # Disable Direct Access Grants
+            "frontchannelLogout": True, # Enable Front Channel Logout
             "alwaysDisplayInConsole": True, # Always display in UI: On
             "redirectUris": client_def.get('redirectUris', ['*']),
             # Add secret if provided, otherwise Keycloak generates it
