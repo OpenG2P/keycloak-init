@@ -22,7 +22,7 @@ clients: []
 #    name: "Social Registry ODK Prod"
 #    redirectUris: 
 #      - "*"
-#    secret: "optional-secret-value"
+#    secret: "optional-secret-value" (If not provided, a random secret is generated and stored in a K8s Secret)
 
 job:
   backoffLimit: 3

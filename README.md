@@ -12,7 +12,7 @@ The solution consists of:
 
 - Keycloak 24.x
 - Kubernetes Cluster
-- Helm
+- Helm 3.x (Required for lookup function support)
 
 ## Directory Structure
 
@@ -59,7 +59,7 @@ clients:
     name: "Social Registry ODK Prod"
     redirectUris: 
       - "*"
-    secret: "optional-secret"
+    # secret: "optional-secret" # If omitted, a random secret is generated and stored in a K8s Secret
   - clientId: "another-client"
 ```
 
@@ -71,15 +71,27 @@ helm install keycloak-init ./helm
 
 This will spawn a Job that runs the python script to create/update the clients in Keycloak.
 
+## Secret Management
+
+-   **Automatic Generation**: If a client secret is not provided in `values.yaml`, the Helm chart automatically generates a random 32-character alphanumeric secret.
+-   **Persistence**: The secret is stored in a Kubernetes Secret named after the `clientId`.
+-   **Idempotency**: On subsequent upgrades, the chart checks for an existing Kubernetes Secret using the `lookup` function. If it exists, the existing secret is preserved; otherwise, a new one is generated.
+-   **Injection**: The secret is mounted into the job container at `/secrets/<clientId>/client_secret` and consumed by the script.
+
 ## Features
 
-- **Idempotent**: The script checks if a client exists. If it does, it updates it; otherwise, it creates it.
-- **Mappers Configuration**:
-    - Removes `Audience Resolve` mapper.
-    - Adds `Audience` mapper with `included.client.audience` set to the client ID.
-    - Adds `Client Roles` mapper.
-- **Scope Configuration**:
-    - Removes `roles` from default and optional client scopes.
+-   **Idempotent Execution**: The script checks if a client exists. If it does, it updates it; otherwise, it creates it.
+-   **Client Configuration**:
+    -   Standard Flow and Service Accounts enabled.
+    -   Direct Access Grants disabled.
+    -   Front Channel Logout enabled.
+-   **Mappers Configuration**:
+    -   Removes `Audience Resolve` mapper.
+    -   Adds `Audience` mapper with `included.client.audience` set to the client ID.
+    -   Adds `Client Roles` mapper (with access token and introspection claims).
+    -   Adds standard mappers: `email`, `address`, `email verified`, `Client Host`, `full name`, `Client IP Address`, `allowed web origins`, `birthdate`, `gender`, `Client ID`, `acr loa level`, `family name`.
+-   **Scope Configuration**:
+    -   Retains `roles` scope (previously removed, now preserved).
 
 ## Configuration Options
 

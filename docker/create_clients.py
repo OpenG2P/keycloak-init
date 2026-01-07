@@ -356,7 +356,13 @@ def main():
             # If we want to set a specific secret (e.g. from GitOps), we can support it.
             # But usually for creation we let Keycloak generate it or we set it if provided.
         }
-        if 'secret' in client_def:
+        # Check for mounted secret
+        secret_file = f"/secrets/{client_def['clientId']}/client_secret"
+        if os.path.exists(secret_file):
+            print(f"Reading secret from {secret_file}")
+            with open(secret_file, 'r') as f:
+                client_config['secret'] = f.read().strip()
+        elif 'secret' in client_def:
             client_config['secret'] = client_def['secret']
         
         create_client(KEYCLOAK_URL, KEYCLOAK_REALM, token, client_config)

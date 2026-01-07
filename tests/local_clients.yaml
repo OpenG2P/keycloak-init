@@ -3,4 +3,4 @@ clients:
     name: "Test Client Local"
     redirectUris: 
       - "*"
-    secret: "test-secret-123"
+    # secret: "test-secret-123"
