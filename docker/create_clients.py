@@ -276,7 +276,12 @@ def upsert_mapper(mappers_url, headers, existing_mappers, mapper_config):
     existing = next((m for m in existing_mappers if m['name'] == mapper_config['name']), None)
     if existing:
         print(f"Updating mapper {mapper_config['name']}...")
-        requests.put(f"{mappers_url}/{existing['id']}", headers=headers, json=mapper_config).raise_for_status()
+        # Merge configuration to preserve ID and other fields
+        updated_mapper = existing.copy()
+        updated_mapper.update(mapper_config)
+        # Ensure the ID matches the path
+        updated_mapper['id'] = existing['id']
+        requests.put(f"{mappers_url}/{existing['id']}", headers=headers, json=updated_mapper).raise_for_status()
     else:
         print(f"Creating mapper {mapper_config['name']}...")
         requests.post(mappers_url, headers=headers, json=mapper_config).raise_for_status()
