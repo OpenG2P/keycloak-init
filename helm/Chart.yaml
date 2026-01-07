@@ -1,0 +1,6 @@
+apiVersion: v2
+name: keycloak-client-init
+description: A Helm chart to initialize Keycloak clients
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

@@ -1,0 +1,29 @@
+image:
+  repository: mosip/keycloak-client-init
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+keycloak:
+  url: "http://keycloak.keycloak.svc.cluster.local:8080"
+  user: "admin"
+  password: "admin_password" # Change this or use existing secret
+  realm: "master"
+  # If you want to use an existing secret for password
+  existingSecret: "" 
+  existingSecretKey: "password"
+
+clients: []
+#  - clientId: "openg2p-sr-odk-prod"
+#    name: "Social Registry ODK Prod"
+#    redirectUris: 
+#      - "*"
+#    secret: "optional-secret-value"
+
+job:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 600
