@@ -17,7 +17,7 @@ The solution consists of:
 ## Directory Structure
 
 ```
-keycloak-client-init/
+keycloak-init/
 ├── docker/
 │   ├── Dockerfile
 │   └── create_clients.py
@@ -35,8 +35,8 @@ Build the Docker image and push it to your registry.
 
 ```bash
 cd docker
-docker build -t your-registry/keycloak-client-init:1.0.0 .
-docker push your-registry/keycloak-client-init:1.0.0
+docker build -t your-registry/keycloak-init:1.0.0 .
+docker push your-registry/keycloak-init:1.0.0
 ```
 
 ### 2. Configure Helm Chart
@@ -45,7 +45,7 @@ Update `helm/values.yaml` with your Keycloak details and the list of clients you
 
 ```yaml
 image:
-  repository: your-registry/keycloak-client-init
+  repository: your-registry/keycloak-init
   tag: "1.0.0"
 
 keycloak:
@@ -66,7 +66,7 @@ clients:
 ### 3. Install Helm Chart
 
 ```bash
-helm install keycloak-client-init ./helm
+helm install keycloak-init ./helm
 ```
 
 This will spawn a Job that runs the python script to create/update the clients in Keycloak.

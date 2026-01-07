@@ -1,9 +1,9 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "keycloak-client-init.fullname" . }}
+  name: {{ include "keycloak-init.fullname" . }}
   labels:
-    {{- include "keycloak-client-init.labels" . | nindent 4 }}
+    {{- include "keycloak-init.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-delete-policy": before-hook-creation
@@ -13,7 +13,7 @@ spec:
   template:
     metadata:
       labels:
-        {{- include "keycloak-client-init.labels" . | nindent 8 }}
+        {{- include "keycloak-init.labels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -49,4 +49,4 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: {{ include "keycloak-client-init.fullname" . }}-config
+            name: {{ include "keycloak-init.fullname" . }}-config

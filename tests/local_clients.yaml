@@ -1,0 +1,6 @@
+clients:
+  - clientId: "test-client-local"
+    name: "Test Client Local"
+    redirectUris: 
+      - "*"
+    secret: "test-secret-123"

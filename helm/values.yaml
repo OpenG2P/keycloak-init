@@ -1,5 +1,5 @@
 image:
-  repository: mosip/keycloak-client-init
+  repository: mosip/keycloak-init
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
