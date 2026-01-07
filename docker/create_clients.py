@@ -109,13 +109,167 @@ def configure_mappers(base_url, realm, token, client_uuid, client_id_name):
         "config": {
             "claim.name": "client_roles",
             "id.token.claim": "true",
+            "access.token.claim": "true",
             "userinfo.token.claim": "true",
+            "introspection.token.claim": "true",
             "multivalued": "true",
             "usermodel.clientRoleMapping.clientId": client_id_name,
              "jsonType.label": "String"
         }
     }
     upsert_mapper(mappers_url, headers, existing_mappers, client_roles_config)
+
+    # 4. Add other required mappers
+    common_mappers = [
+        {
+            "name": "email",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-usermodel-property-mapper",
+            "config": {
+                "user.attribute": "email",
+                "claim.name": "email",
+                "jsonType.label": "String",
+                "id.token.claim": "true",
+                "access.token.claim": "true",
+                "userinfo.token.claim": "true"
+            }
+        },
+        {
+            "name": "address",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-address-mapper",
+            "config": {
+                "user.attribute.formatted": "formatted",
+                "user.attribute.country": "country",
+                "user.attribute.postal_code": "postal_code",
+                "user.attribute.street": "street",
+                "user.attribute.region": "region",
+                "user.attribute.locality": "locality",
+                "claim.name": "address",
+                "jsonType.label": "JSON",
+                "id.token.claim": "true",
+                "access.token.claim": "true",
+                "userinfo.token.claim": "true"
+            }
+        },
+        {
+            "name": "email verified",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-usermodel-property-mapper",
+            "config": {
+                "user.attribute": "emailVerified",
+                "claim.name": "email_verified",
+                "jsonType.label": "boolean",
+                "id.token.claim": "true",
+                "access.token.claim": "true",
+                "userinfo.token.claim": "true"
+            }
+        },
+        {
+            "name": "Client Host",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-usersessionmodel-note-mapper",
+            "config": {
+                "user.session.note": "clientHost",
+                "claim.name": "clientHost",
+                "jsonType.label": "String",
+                "id.token.claim": "true",
+                "access.token.claim": "true"
+            }
+        },
+        {
+            "name": "full name",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-full-name-mapper",
+            "config": {
+                "id.token.claim": "true",
+                "access.token.claim": "true",
+                "userinfo.token.claim": "true"
+            }
+        },
+        {
+            "name": "Client IP Address",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-usersessionmodel-note-mapper",
+            "config": {
+                "user.session.note": "clientAddress",
+                "claim.name": "clientAddress",
+                "jsonType.label": "String",
+                "id.token.claim": "true",
+                "access.token.claim": "true"
+            }
+        },
+        {
+            "name": "allowed web origins",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-allowed-origins-mapper",
+            "config": {}
+        },
+        {
+            "name": "birthdate",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-usermodel-attribute-mapper",
+            "config": {
+                "user.attribute": "birthdate",
+                "claim.name": "birthdate",
+                "jsonType.label": "String",
+                "id.token.claim": "true",
+                "access.token.claim": "true",
+                "userinfo.token.claim": "true"
+            }
+        },
+        {
+            "name": "gender",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-usermodel-attribute-mapper",
+            "config": {
+                "user.attribute": "gender",
+                "claim.name": "gender",
+                "jsonType.label": "String",
+                "id.token.claim": "true",
+                "access.token.claim": "true",
+                "userinfo.token.claim": "true"
+            }
+        },
+        {
+            "name": "Client ID",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-usersessionmodel-note-mapper",
+            "config": {
+                "user.session.note": "clientId",
+                "claim.name": "clientId",
+                "jsonType.label": "String",
+                "id.token.claim": "true",
+                "access.token.claim": "true"
+            }
+        },
+        {
+            "name": "acr loa level",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-acr-mapper",
+            "config": {
+                "id.token.claim": "true",
+                "access.token.claim": "true",
+                "userinfo.token.claim": "true"
+            }
+        },
+        {
+            "name": "family name",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-usermodel-property-mapper",
+            "config": {
+                "user.attribute": "lastName",
+                "claim.name": "family_name",
+                "jsonType.label": "String",
+                "id.token.claim": "true",
+                "access.token.claim": "true",
+                "userinfo.token.claim": "true"
+            }
+        }
+    ]
+
+    for mapper in common_mappers:
+        upsert_mapper(mappers_url, headers, existing_mappers, mapper)
 
 def upsert_mapper(mappers_url, headers, existing_mappers, mapper_config):
     # Find by name
