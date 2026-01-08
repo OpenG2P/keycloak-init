@@ -9,19 +9,21 @@ nameOverride: ""
 fullnameOverride: ""
 
 keycloak:
-  url: "http://keycloak.keycloak.svc.cluster.local:8080"
-  user: "admin"
-  password: "admin_password" # Change this or use existing secret
+  # Internal service name on the cluster
+  url: "http://keycloak"
+  user: "client-manager@openg2p.org" 
+  # Use secret instead of directly passing password here
+  password: ""
   realm: "master"
   # If you want to use an existing secret for password
-  existingSecret: "" 
-  existingSecretKey: "password"
+  existingSecret: "keycloak-client-manager" 
+  existingSecretKey: "keycloak-client-manager-password"
 
-clients: []
-#  - clientId: "openg2p-sr-odk-prod"
-#    name: "Social Registry ODK Prod"
-#    redirectUris: 
-#      - "*"
+clients: 
+  - clientId: "test-client-local"
+    name: "Test Client Local"
+    redirectUris: 
+      - "*"
 #    secret: "optional-secret-value" (If not provided, a random secret is generated and stored in a K8s Secret)
 
 job:

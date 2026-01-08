@@ -103,3 +103,9 @@ This will spawn a Job that runs the python script to create/update the clients i
 | `keycloak.existingSecret` | Secret name containing password | `""` |
 | `clients` | List of clients to create | `[]` |
 
+## Notes
+- A user in Keycloak has been created only to manage clients with following Keycloak roles:
+  - manage-clients
+  - view-clients
+  - query-clients
+  - default-role-master

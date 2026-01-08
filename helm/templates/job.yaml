@@ -1,12 +1,9 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "keycloak-init.fullname" . }}
+  name: {{ include "keycloak-init.fullname" . }}-{{ .Release.Revision }}
   labels:
     {{- include "keycloak-init.labels" . | nindent 4 }}
-  annotations:
-    "helm.sh/hook": post-install,post-upgrade
-    "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   backoffLimit: {{ .Values.job.backoffLimit }}
   ttlSecondsAfterFinished: {{ .Values.job.ttlSecondsAfterFinished }}
