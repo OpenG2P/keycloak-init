@@ -46,10 +46,8 @@ def create_client(base_url, realm, token, client_config):
     if response.status_code == 200:
         existing_clients = response.json()
         if existing_clients:
-            print(f"Client {client_id} already exists. Updating...")
-            client_uuid = existing_clients[0]['id']
-            # Update existing
-            requests.put(f"{clients_url}/{client_uuid}", headers=headers, json=client_config).raise_for_status()
+            print(f"Client {client_id} already exists. Skipping...")
+            return
         else:
             # Create new
             print(f"Creating client {client_id}...")
