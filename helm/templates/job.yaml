@@ -12,6 +12,8 @@ spec:
       labels:
         {{- include "keycloak-init.labels" . | nindent 8 }}
     spec:
+      {{- $suffix := tpl .Values.suffix . }}
+      {{- $ctx := merge (dict "suffix" $suffix) . }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -44,8 +46,8 @@ spec:
               mountPath: /config
               readOnly: true
             {{- range .Values.clients }}
-            - name: secret-{{ .clientId }}
-              mountPath: /secrets/{{ .clientId }}
+            - name: secret-{{ tpl .clientId $ctx }}
+              mountPath: /secrets/{{ tpl .clientId $ctx }}
               readOnly: true
             {{- end }}
       volumes:
@@ -53,9 +55,9 @@ spec:
           configMap:
             name: {{ include "keycloak-init.fullname" . }}-config
         {{- range .Values.clients }}
-        - name: secret-{{ .clientId }}
+        - name: secret-{{ tpl .clientId $ctx }}
           secret:
-            secretName: {{ .clientId }}
+            secretName: {{ tpl .clientId $ctx }}
             items:
               - key: client_secret
                 path: client_secret

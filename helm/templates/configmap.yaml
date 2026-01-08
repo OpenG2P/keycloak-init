@@ -7,4 +7,6 @@ metadata:
 data:
   clients.yaml: |
     clients:
-    {{- toYaml .Values.clients | nindent 6 }}
+    {{- $suffix := tpl .Values.suffix . }}
+    {{- $ctx := merge (dict "suffix" $suffix) . }}
+    {{- tpl (toYaml .Values.clients) $ctx | nindent 6 }}
