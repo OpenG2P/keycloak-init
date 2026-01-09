@@ -62,10 +62,34 @@ def create_client(base_url, realm, token, client_config):
     # 2. Configure Mappers
     configure_mappers(base_url, realm, token, client_uuid, client_id)
 
-    # 3. Retain "roles" scope (Logic to remove it is now removed)
+    # 3. Configure Client Roles
+    configure_client_roles(base_url, realm, token, client_uuid, client_roles)
+
+    # 4. Retain "roles" scope (Logic to remove it is now removed)
     # configure_scopes(base_url, realm, token, client_uuid)
 
     print(f"Client {client_id} processed successfully.")
+
+def configure_client_roles(base_url, realm, token, client_uuid, roles):
+    if not roles:
+        return
+
+    headers = get_headers(token)
+    roles_url = f"{base_url}/admin/realms/{realm}/clients/{client_uuid}/roles"
+
+    for role_name in roles:
+        print(f"Creating client role '{role_name}'...")
+        role_payload = {
+            "name": role_name
+        }
+        try:
+            requests.post(roles_url, headers=headers, json=role_payload).raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 409:
+                print(f"Role '{role_name}' already exists.")
+            else:
+                print(f"Failed to create role '{role_name}': {e}")
+                raise
 
 def configure_mappers(base_url, realm, token, client_uuid, client_id_name):
     headers = get_headers(token)
