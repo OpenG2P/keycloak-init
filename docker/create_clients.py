@@ -34,7 +34,7 @@ def get_headers(token):
         'Content-Type': 'application/json'
     }
 
-def create_client(base_url, realm, token, client_config):
+def create_client(base_url, realm, token, client_config, client_roles=None):
     client_id = client_config['clientId']
     print(f"Processing client: {client_id}")
 
@@ -373,7 +373,6 @@ def main():
             "frontchannelLogout": True, # Enable Front Channel Logout
             "alwaysDisplayInConsole": True, # Always display in UI: On
             "redirectUris": client_def.get('redirectUris', ['*']),
-            #"clientRoles": client_def.get('clientRoles', []),
             # Add secret if provided, otherwise Keycloak generates it
             # Docs say "note down the client ID and secret". 
             # If we want to set a specific secret (e.g. from GitOps), we can support it.
@@ -388,7 +387,8 @@ def main():
         elif 'secret' in client_def:
             client_config['secret'] = client_def['secret']
         
-        create_client(KEYCLOAK_URL, KEYCLOAK_REALM, token, client_config)
+        client_roles = client_def.get('clientRoles', [])
+        create_client(KEYCLOAK_URL, KEYCLOAK_REALM, token, client_config, client_roles)
 
 if __name__ == "__main__":
     main()
