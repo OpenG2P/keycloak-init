@@ -349,6 +349,7 @@ def main():
             "frontchannelLogout": True, # Enable Front Channel Logout
             "alwaysDisplayInConsole": True, # Always display in UI: On
             "redirectUris": client_def.get('redirectUris', ['*']),
+            "clientRoles": client_def.get('clientRoles', []),
             # Add secret if provided, otherwise Keycloak generates it
             # Docs say "note down the client ID and secret". 
             # If we want to set a specific secret (e.g. from GitOps), we can support it.
