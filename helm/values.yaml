@@ -1,6 +1,6 @@
 image:
   repository: openg2p/keycloak-init
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "develop"
 
@@ -38,18 +38,26 @@ clients:
     name: 'Superset {{ .suffix }}'
     redirectUris: 
       - "*"
+    clientRoles:
+      - "Admin"
   - clientId: 'openg2p-opensearch-{{ .suffix }}'
     name: 'OpenSearch {{ .suffix }}'
     redirectUris: 
       - "*"
+    clientRoles:
+      - "admin"
   - clientId: 'openg2p-kafka-{{ .suffix }}'
     name: 'Kafka {{ .suffix }}'
     redirectUris: 
       - "*"
+    clientRoles:
+      - "Admin"
   - clientId: 'openg2p-minio-{{ .suffix }}'
     name: 'MinIO {{ .suffix }}'
     redirectUris: 
       - "*"
+    clientRoles:
+      - "consoleAdmin"
 
 job:
   backoffLimit: 3
