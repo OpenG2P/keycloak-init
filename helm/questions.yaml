@@ -1,0 +1,21 @@
+questions:
+
+# Keycloak server
+- variable: keycloak.url
+  description: URL of the Keycloak server
+  type: string
+  label: Keycloak URL
+- variable: keycloak.user
+  description: User on Keycloak with client management permissions
+  type: string
+  label: Keycloak User
+- variable: keycloak.existingSecret
+  description: Secret containing user password
+  type: string
+  label: Keycloak User Secret Name
+- variable: keycloak.existingSecretKey
+  description: Key in secret containing user password
+  type: string
+  label: Keycloak User Secret Key
+
+
