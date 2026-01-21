@@ -8,6 +8,8 @@ on:
       - '**'
     paths:
       - 'helm/**'
+  workflow_dispatch:
+
 jobs:
   generate-charts:
     runs-on: ubuntu-latest
