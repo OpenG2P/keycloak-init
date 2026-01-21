@@ -6,9 +6,6 @@ on:
       - '**'
     paths:
       - 'helm/**'
-    branches-ignore:
-      - develop
-
 jobs:
   generate-charts:
     runs-on: ubuntu-latest
