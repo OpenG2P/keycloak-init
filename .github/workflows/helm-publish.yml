@@ -2,6 +2,8 @@ name: Publish Helm Charts
 
 on:
   push:
+    branches:
+      - '**'
     tags:
       - '**'
     paths:
