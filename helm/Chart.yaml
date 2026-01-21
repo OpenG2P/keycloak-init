@@ -7,4 +7,3 @@ icon: https://openg2p.github.io/openg2p-helm/openg2p-logo.png
 annotations:
   catalog.cattle.io/display-name: "OpenG2P Keycloak Init"
   openg2p.org/add-to-rancher: ""
-

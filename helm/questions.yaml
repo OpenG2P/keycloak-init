@@ -17,5 +17,3 @@ questions:
   description: Key in secret containing user password
   type: string
   label: Keycloak User Secret Key
-
-

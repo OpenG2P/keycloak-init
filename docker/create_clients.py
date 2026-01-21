@@ -94,11 +94,11 @@ def configure_client_roles(base_url, realm, token, client_uuid, roles):
 def configure_mappers(base_url, realm, token, client_uuid, client_id_name):
     headers = get_headers(token)
     mappers_url = f"{base_url}/admin/realms/{realm}/clients/{client_uuid}/protocol-mappers/models"
-    
+
     # Get existing mappers
     response = requests.get(mappers_url, headers=headers)
     existing_mappers = response.json()
-    
+
     # 1. Remove "Audience Resolve"
     for mapper in existing_mappers:
         # Specifically remove 'Audience Resolve' as per docs
@@ -311,7 +311,7 @@ def upsert_mapper(mappers_url, headers, existing_mappers, mapper_config):
 def configure_scopes(base_url, realm, token, client_uuid):
     headers = get_headers(token)
     # Docs: Navigate to Client details -> Client Scopes. Remove "roles" scope.
-    
+
     # Get assigned default client scopes
     default_scopes_url = f"{base_url}/admin/realms/{realm}/clients/{client_uuid}/default-client-scopes"
     response = requests.get(default_scopes_url, headers=headers)
@@ -334,7 +334,7 @@ def configure_scopes(base_url, realm, token, client_uuid):
 
 def main():
     print("Starting Keycloak Client Creation...")
-    
+
     # Wait for Keycloak to be ready
     token = None
     for i in range(30):
@@ -346,7 +346,7 @@ def main():
             pass
         print("Waiting for Keycloak...")
         time.sleep(5)
-    
+
     if not token:
         print("Could not connect to Keycloak.")
         sys.exit(1)
@@ -374,7 +374,7 @@ def main():
             "alwaysDisplayInConsole": True, # Always display in UI: On
             "redirectUris": client_def.get('redirectUris', ['*']),
             # Add secret if provided, otherwise Keycloak generates it
-            # Docs say "note down the client ID and secret". 
+            # Docs say "note down the client ID and secret".
             # If we want to set a specific secret (e.g. from GitOps), we can support it.
             # But usually for creation we let Keycloak generate it or we set it if provided.
         }
@@ -386,7 +386,7 @@ def main():
                 client_config['secret'] = f.read().strip()
         elif 'secret' in client_def:
             client_config['secret'] = client_def['secret']
-        
+
         client_roles = client_def.get('clientRoles', [])
         create_client(KEYCLOAK_URL, KEYCLOAK_REALM, token, client_config, client_roles)
 
