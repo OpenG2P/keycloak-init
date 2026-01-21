@@ -1,6 +1,6 @@
 apiVersion: v2
 name: keycloak-init
-description: A Helm chart to initialize Keycloak clients
+description: Helm chart to initialize Keycloak clients
 type: application
 version: 0.0.0-develop
 icon: https://openg2p.github.io/openg2p-helm/openg2p-logo.png
