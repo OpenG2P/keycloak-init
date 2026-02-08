@@ -27,6 +27,10 @@ suffix: '{{ .Release.Namespace }}'
 #  (Recommended)
 clients:
   - clientId: 'openg2p-sr-{{ .suffix }}'
+    name: 'Social Registry {{ .suffix }}'
+    redirectUris:
+      - "*"
+  - clientId: 'openg2p-registry-{{ .suffix }}'
     name: 'Registry {{ .suffix }}'
     redirectUris:
       - "*"
