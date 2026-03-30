@@ -18,59 +18,60 @@ keycloak:
   existingSecret: "keycloak-client-manager"
   existingSecretKey: "keycloak-client-manager-password"
 
-# Suffix used for client name (see below)
+# Suffix appended to realm names (e.g. staff -> staff-qa)
 suffix: '{{ .Release.Namespace }}'
 # Define realms and their clients below.
 # If a realm does not exist, it will be created automatically.
+# Realm names support {{ .suffix }} template which resolves to the suffix above.
 # In the client parameters below, additionally you can define
 #  secret: "optional-secret-value"
 #  If not provided, a random secret is generated and stored in a K8s Secret
 #  (Recommended)
 realms:
-  staff:
+  staff-{{ .suffix }}:
     clients:
-      - clientId: 'openg2p-sr-{{ .suffix }}'
-        name: 'Social Registry {{ .suffix }}'
+      - clientId: openg2p-sr
+        name: Social Registry
         redirectUris:
           - "*"
-      - clientId: 'openg2p-registry-{{ .suffix }}'
-        name: 'Registry {{ .suffix }}'
+      - clientId: openg2p-registry
+        name: Registry
         redirectUris:
           - "*"
-      - clientId: 'openg2p-pbms-{{ .suffix }}'
-        name: 'PBMS {{ .suffix }}'
+      - clientId: openg2p-pbms
+        name: PBMS
         redirectUris:
           - "*"
-      - clientId: 'openg2p-superset-{{ .suffix }}'
-        name: 'Superset {{ .suffix }}'
+      - clientId: openg2p-superset
+        name: Superset
         redirectUris:
           - "*"
         clientRoles:
           - "Admin"
-      - clientId: 'openg2p-opensearch-{{ .suffix }}'
-        name: 'OpenSearch {{ .suffix }}'
+      - clientId: openg2p-opensearch
+        name: OpenSearch
         redirectUris:
           - "*"
         clientRoles:
           - "admin"
-      - clientId: 'openg2p-kafka-{{ .suffix }}'
-        name: 'Kafka {{ .suffix }}'
+      - clientId: openg2p-kafka
+        name: Kafka
         redirectUris:
           - "*"
         clientRoles:
           - "Admin"
-      - clientId: 'openg2p-minio-{{ .suffix }}'
-        name: 'MinIO {{ .suffix }}'
+      - clientId: openg2p-minio
+        name: MinIO
         redirectUris:
           - "*"
         clientRoles:
           - "consoleAdmin"
-      - clientId: 'openg2p-odk-{{ .suffix }}'
-        name: 'ODK {{ .suffix }}'
+      - clientId: openg2p-odk
+        name: ODK
         redirectUris:
           - "*"
-      - clientId: 'openg2p-spar-{{ .suffix }}'
-        name: 'SPAR {{ .suffix }}'
+      - clientId: openg2p-spar
+        name: SPAR
         redirectUris:
           - "*"
 

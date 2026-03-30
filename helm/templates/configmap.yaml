@@ -10,7 +10,7 @@ data:
     {{- $suffix := tpl .Values.suffix . }}
     {{- $ctx := merge (dict "suffix" $suffix) . }}
     {{- range $realmName, $realmDef := .Values.realms }}
-      {{ $realmName }}:
+      {{ tpl $realmName $ctx }}:
         clients:
-        {{- tpl (toYaml $realmDef.clients) $ctx | nindent 8 }}
+        {{- toYaml $realmDef.clients | nindent 8 }}
     {{- end }}
