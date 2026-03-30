@@ -8,6 +8,7 @@ on:
       - '**'
     paths:
       - 'helm/**'
+      - '.github/workflows/helm-publish.yml'
   workflow_dispatch:
 
 jobs:
