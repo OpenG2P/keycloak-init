@@ -74,6 +74,10 @@ realms:
         name: SPAR
         redirectUris:
           - "*"
+  agent-{{ .suffix }}:
+    clients: []
+  beneficiary-{{ .suffix }}:
+    clients: []
 
 job:
   backoffLimit: 3
