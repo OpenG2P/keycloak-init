@@ -1,6 +1,8 @@
-clients:
-  - clientId: "test-client-local"
-    name: "Test Client Local"
-    redirectUris:
-      - "*"
-    # secret: "test-secret-123"
+realms:
+  test-realm:
+    clients:
+      - clientId: "test-client-local"
+        name: "Test Client Local"
+        redirectUris:
+          - "*"
+        # secret: "test-secret-123"

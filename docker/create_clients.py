@@ -9,7 +9,6 @@ import time
 KEYCLOAK_URL = os.environ.get('KEYCLOAK_URL', 'http://localhost:8080')
 KEYCLOAK_USER = os.environ.get('KEYCLOAK_USER', 'admin')
 KEYCLOAK_PASSWORD = os.environ.get('KEYCLOAK_PASSWORD', 'admin')
-KEYCLOAK_REALM = os.environ.get('KEYCLOAK_REALM', 'master')
 INPUT_FILE = os.environ.get('INPUT_FILE', '/config/clients.yaml')
 
 def get_admin_token():
@@ -33,6 +32,26 @@ def get_headers(token):
         'Authorization': f'Bearer {token}',
         'Content-Type': 'application/json'
     }
+
+def ensure_realm(base_url, token, realm_name):
+    """Create a realm if it does not already exist. Skip if it exists."""
+    headers = get_headers(token)
+    realm_url = f"{base_url}/admin/realms/{realm_name}"
+    response = requests.get(realm_url, headers=headers)
+    if response.status_code == 200:
+        print(f"Realm '{realm_name}' already exists. Skipping creation.")
+        return
+    if response.status_code == 404:
+        print(f"Creating realm '{realm_name}'...")
+        create_url = f"{base_url}/admin/realms"
+        payload = {
+            "realm": realm_name,
+            "enabled": True
+        }
+        requests.post(create_url, headers=headers, json=payload).raise_for_status()
+        print(f"Realm '{realm_name}' created successfully.")
+        return
+    response.raise_for_status()
 
 def create_client(base_url, realm, token, client_config, client_roles=None):
     client_id = client_config['clientId']
@@ -359,36 +378,37 @@ def main():
     with open(INPUT_FILE, 'r') as f:
         config = yaml.safe_load(f)
 
-    clients = config.get('clients', [])
-    for client_def in clients:
-        # Construct base client config from params
-        client_config = {
-            "clientId": client_def['clientId'],
-            "name": client_def.get('name', client_def['clientId']),
-            "protocol": "openid-connect",
-            "publicClient": False, # Client authentication: On
-            "standardFlowEnabled": True, # Standard flow
-            "serviceAccountsEnabled": True, # Service accounts roles
-            "directAccessGrantsEnabled": False, # Disable Direct Access Grants
-            "frontchannelLogout": True, # Enable Front Channel Logout
-            "alwaysDisplayInConsole": True, # Always display in UI: On
-            "redirectUris": client_def.get('redirectUris', ['*']),
-            # Add secret if provided, otherwise Keycloak generates it
-            # Docs say "note down the client ID and secret".
-            # If we want to set a specific secret (e.g. from GitOps), we can support it.
-            # But usually for creation we let Keycloak generate it or we set it if provided.
-        }
-        # Check for mounted secret
-        secret_file = f"/secrets/{client_def['clientId']}/client_secret"
-        if os.path.exists(secret_file):
-            print(f"Reading secret from {secret_file}")
-            with open(secret_file, 'r') as f:
-                client_config['secret'] = f.read().strip()
-        elif 'secret' in client_def:
-            client_config['secret'] = client_def['secret']
+    realms = config.get('realms', {})
+    for realm_name, realm_def in realms.items():
+        print(f"\n--- Processing realm: {realm_name} ---")
+        ensure_realm(KEYCLOAK_URL, token, realm_name)
 
-        client_roles = client_def.get('clientRoles', [])
-        create_client(KEYCLOAK_URL, KEYCLOAK_REALM, token, client_config, client_roles)
+        clients = realm_def.get('clients', [])
+        for client_def in clients:
+            # Construct base client config from params
+            client_config = {
+                "clientId": client_def['clientId'],
+                "name": client_def.get('name', client_def['clientId']),
+                "protocol": "openid-connect",
+                "publicClient": False, # Client authentication: On
+                "standardFlowEnabled": True, # Standard flow
+                "serviceAccountsEnabled": True, # Service accounts roles
+                "directAccessGrantsEnabled": False, # Disable Direct Access Grants
+                "frontchannelLogout": True, # Enable Front Channel Logout
+                "alwaysDisplayInConsole": True, # Always display in UI: On
+                "redirectUris": client_def.get('redirectUris', ['*']),
+            }
+            # Check for mounted secret
+            secret_file = f"/secrets/{client_def['clientId']}/client_secret"
+            if os.path.exists(secret_file):
+                print(f"Reading secret from {secret_file}")
+                with open(secret_file, 'r') as f:
+                    client_config['secret'] = f.read().strip()
+            elif 'secret' in client_def:
+                client_config['secret'] = client_def['secret']
+
+            client_roles = client_def.get('clientRoles', [])
+            create_client(KEYCLOAK_URL, realm_name, token, client_config, client_roles)
 
 if __name__ == "__main__":
     main()

@@ -6,7 +6,11 @@ metadata:
     {{- include "keycloak-init.labels" . | nindent 4 }}
 data:
   clients.yaml: |
-    clients:
+    realms:
     {{- $suffix := tpl .Values.suffix . }}
     {{- $ctx := merge (dict "suffix" $suffix) . }}
-    {{- tpl (toYaml .Values.clients) $ctx | nindent 6 }}
+    {{- range $realmName, $realmDef := .Values.realms }}
+      {{ $realmName }}:
+        clients:
+        {{- tpl (toYaml $realmDef.clients) $ctx | nindent 8 }}
+    {{- end }}

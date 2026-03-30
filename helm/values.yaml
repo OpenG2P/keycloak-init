@@ -14,62 +14,65 @@ keycloak:
   user: "client-manager@openg2p.org"
   # Use secret instead of directly passing password here
   password: ""
-  realm: "master"
   # If you want to use an existing secret for password
   existingSecret: "keycloak-client-manager"
   existingSecretKey: "keycloak-client-manager-password"
 
 # Suffix used for client name (see below)
 suffix: '{{ .Release.Namespace }}'
+# Define realms and their clients below.
+# If a realm does not exist, it will be created automatically.
 # In the client parameters below, additionally you can define
 #  secret: "optional-secret-value"
 #  If not provided, a random secret is generated and stored in a K8s Secret
 #  (Recommended)
-clients:
-  - clientId: 'openg2p-sr-{{ .suffix }}'
-    name: 'Social Registry {{ .suffix }}'
-    redirectUris:
-      - "*"
-  - clientId: 'openg2p-registry-{{ .suffix }}'
-    name: 'Registry {{ .suffix }}'
-    redirectUris:
-      - "*"
-  - clientId: 'openg2p-pbms-{{ .suffix }}'
-    name: 'PBMS {{ .suffix }}'
-    redirectUris:
-      - "*"
-  - clientId: 'openg2p-superset-{{ .suffix }}'
-    name: 'Superset {{ .suffix }}'
-    redirectUris:
-      - "*"
-    clientRoles:
-      - "Admin"
-  - clientId: 'openg2p-opensearch-{{ .suffix }}'
-    name: 'OpenSearch {{ .suffix }}'
-    redirectUris:
-      - "*"
-    clientRoles:
-      - "admin"
-  - clientId: 'openg2p-kafka-{{ .suffix }}'
-    name: 'Kafka {{ .suffix }}'
-    redirectUris:
-      - "*"
-    clientRoles:
-      - "Admin"
-  - clientId: 'openg2p-minio-{{ .suffix }}'
-    name: 'MinIO {{ .suffix }}'
-    redirectUris:
-      - "*"
-    clientRoles:
-      - "consoleAdmin"
-  - clientId: 'openg2p-odk-{{ .suffix }}'
-    name: 'ODK {{ .suffix }}'
-    redirectUris:
-      - "*"
-  - clientId: 'openg2p-spar-{{ .suffix }}'
-    name: 'SPAR {{ .suffix }}'
-    redirectUris:
-      - "*"
+realms:
+  staff:
+    clients:
+      - clientId: 'openg2p-sr-{{ .suffix }}'
+        name: 'Social Registry {{ .suffix }}'
+        redirectUris:
+          - "*"
+      - clientId: 'openg2p-registry-{{ .suffix }}'
+        name: 'Registry {{ .suffix }}'
+        redirectUris:
+          - "*"
+      - clientId: 'openg2p-pbms-{{ .suffix }}'
+        name: 'PBMS {{ .suffix }}'
+        redirectUris:
+          - "*"
+      - clientId: 'openg2p-superset-{{ .suffix }}'
+        name: 'Superset {{ .suffix }}'
+        redirectUris:
+          - "*"
+        clientRoles:
+          - "Admin"
+      - clientId: 'openg2p-opensearch-{{ .suffix }}'
+        name: 'OpenSearch {{ .suffix }}'
+        redirectUris:
+          - "*"
+        clientRoles:
+          - "admin"
+      - clientId: 'openg2p-kafka-{{ .suffix }}'
+        name: 'Kafka {{ .suffix }}'
+        redirectUris:
+          - "*"
+        clientRoles:
+          - "Admin"
+      - clientId: 'openg2p-minio-{{ .suffix }}'
+        name: 'MinIO {{ .suffix }}'
+        redirectUris:
+          - "*"
+        clientRoles:
+          - "consoleAdmin"
+      - clientId: 'openg2p-odk-{{ .suffix }}'
+        name: 'ODK {{ .suffix }}'
+        redirectUris:
+          - "*"
+      - clientId: 'openg2p-spar-{{ .suffix }}'
+        name: 'SPAR {{ .suffix }}'
+        redirectUris:
+          - "*"
 
 job:
   backoffLimit: 3
