@@ -23,7 +23,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: KEYCLOAK_URL
-              value: {{ tpl .Values.keycloak.url . | quote }}
+              value: {{ tpl (coalesce .Values.keycloak.url .Values.global.keycloakBaseUrl) . | quote }}
             - name: KEYCLOAK_USER
               value: {{ .Values.keycloak.user | quote }}
             - name: KEYCLOAK_PASSWORD

@@ -8,8 +8,11 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+global:
+  keycloakBaseUrl: ""
+
 keycloak:
-  # Internal service name on the cluster
+  # Keycloak URL. If empty, falls back to global.keycloakBaseUrl
   url: "https://keycloak2.openg2p.org"
   user: "client-manager@openg2p.org"
   # Use secret instead of directly passing password here
