@@ -12,5 +12,8 @@ data:
     {{- range $realmName, $realmDef := .Values.realms }}
       {{ tpl $realmName $ctx }}:
         clients:
+        {{- if $realmDef.clients }}
         {{- toYaml $realmDef.clients | nindent 8 }}
+        {{- else }} []
+        {{- end }}
     {{- end }}
