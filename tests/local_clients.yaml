@@ -5,4 +5,11 @@ realms:
         name: "Test Client Local"
         redirectUris:
           - "*"
+        clientRoles:
+          - "role-a"
+          - "role-b"
+          - name: "super-role"
+            composites:
+              - "role-a"
+              - "role-b"
         # secret: "test-secret-123"

@@ -96,11 +96,21 @@ def configure_client_roles(base_url, realm, token, client_uuid, roles):
     headers = get_headers(token)
     roles_url = f"{base_url}/admin/realms/{realm}/clients/{client_uuid}/roles"
 
-    for role_name in roles:
+    # First pass: create all roles
+    composite_definitions = []
+    for role_entry in roles:
+        if isinstance(role_entry, str):
+            role_name = role_entry
+        elif isinstance(role_entry, dict):
+            role_name = role_entry['name']
+            if 'composites' in role_entry:
+                composite_definitions.append(role_entry)
+        else:
+            print(f"Skipping invalid role entry: {role_entry}")
+            continue
+
         print(f"Creating client role '{role_name}'...")
-        role_payload = {
-            "name": role_name
-        }
+        role_payload = {"name": role_name}
         try:
             requests.post(roles_url, headers=headers, json=role_payload).raise_for_status()
         except requests.exceptions.HTTPError as e:
@@ -109,6 +119,51 @@ def configure_client_roles(base_url, realm, token, client_uuid, roles):
             else:
                 print(f"Failed to create role '{role_name}': {e}")
                 raise
+
+    # Second pass: configure composite roles
+    for comp_entry in composite_definitions:
+        configure_composite_role(base_url, realm, token, client_uuid, comp_entry)
+
+def configure_composite_role(base_url, realm, token, client_uuid, comp_entry):
+    """Make a client role composite by adding child roles to it."""
+    headers = get_headers(token)
+    role_name = comp_entry['name']
+    child_names = comp_entry.get('composites', [])
+    if not child_names:
+        return
+
+    composites_url = (
+        f"{base_url}/admin/realms/{realm}/clients/{client_uuid}"
+        f"/roles/{role_name}/composites"
+    )
+
+    # Get existing composites to avoid duplicates
+    response = requests.get(composites_url, headers=headers)
+    if response.status_code == 200:
+        existing_composites = {r['name'] for r in response.json()}
+    else:
+        existing_composites = set()
+
+    # Look up full role representations for children not yet added
+    roles_to_add = []
+    for child_name in child_names:
+        if child_name in existing_composites:
+            print(f"Composite '{role_name}' already contains '{child_name}'. Skipping.")
+            continue
+        role_url = (
+            f"{base_url}/admin/realms/{realm}/clients/{client_uuid}"
+            f"/roles/{child_name}"
+        )
+        resp = requests.get(role_url, headers=headers)
+        if resp.status_code == 200:
+            roles_to_add.append(resp.json())
+        else:
+            print(f"Warning: child role '{child_name}' not found. Skipping.")
+
+    if roles_to_add:
+        print(f"Adding {len(roles_to_add)} child role(s) to composite '{role_name}'...")
+        requests.post(composites_url, headers=headers, json=roles_to_add).raise_for_status()
+        print(f"Composite role '{role_name}' configured successfully.")
 
 def configure_mappers(base_url, realm, token, client_uuid, client_id_name):
     headers = get_headers(token)
