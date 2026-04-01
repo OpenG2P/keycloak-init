@@ -42,10 +42,12 @@ spec:
               mountPath: /config
               readOnly: true
             {{- range $realmName, $realmDef := .Values.realms }}
+            {{- if $realmDef }}
             {{- range $realmDef.clients }}
             - name: secret-{{ .clientId }}
               mountPath: /secrets/{{ .clientId }}
               readOnly: true
+            {{- end }}
             {{- end }}
             {{- end }}
       volumes:
@@ -53,6 +55,7 @@ spec:
           configMap:
             name: {{ include "keycloak-init.fullname" . }}-config
         {{- range $realmName, $realmDef := .Values.realms }}
+        {{- if $realmDef }}
         {{- range $realmDef.clients }}
         - name: secret-{{ .clientId }}
           secret:
@@ -60,5 +63,6 @@ spec:
             items:
               - key: client_secret
                 path: client_secret
+        {{- end }}
         {{- end }}
         {{- end }}

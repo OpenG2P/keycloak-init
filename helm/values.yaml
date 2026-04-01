@@ -74,11 +74,6 @@ realms:
         name: SPAR
         redirectUris:
           - "*"
-  agent:
-    clients: []
-  beneficiary:
-    clients: []
-
 job:
   backoffLimit: 3
   ttlSecondsAfterFinished: 600
