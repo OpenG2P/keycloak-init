@@ -30,7 +30,7 @@ spec:
               {{- if .Values.keycloak.existingSecret }}
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.keycloak.existingSecret }}
+                  name: {{ tpl .Values.keycloak.existingSecret . }}
                   key: {{ .Values.keycloak.existingSecretKey }}
               {{- else }}
               value: {{ .Values.keycloak.password | quote }}

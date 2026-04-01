@@ -14,24 +14,21 @@ global:
 keycloak:
   # Keycloak URL. If empty, falls back to global.keycloakBaseUrl
   url: "https://keycloak2.openg2p.org"
-  user: "client-manager@openg2p.org"
+  user: "admin"
   # Use secret instead of directly passing password here
   password: ""
   # If you want to use an existing secret for password
-  existingSecret: "keycloak-client-manager"
-  existingSecretKey: "keycloak-client-manager-password"
+  existingSecret: "keycloak-admin"
+  existingSecretKey: "keycloak-admin-password"
 
-# Suffix appended to realm names (e.g. staff -> staff-qa)
-suffix: '{{ .Release.Namespace }}'
 # Define realms and their clients below.
 # If a realm does not exist, it will be created automatically.
-# Realm names support {{ .suffix }} template which resolves to the suffix above.
 # In the client parameters below, additionally you can define
 #  secret: "optional-secret-value"
 #  If not provided, a random secret is generated and stored in a K8s Secret
 #  (Recommended)
 realms:
-  staff-{{ .suffix }}:
+  staff:
     clients:
       - clientId: openg2p-sr
         name: Social Registry
@@ -77,9 +74,9 @@ realms:
         name: SPAR
         redirectUris:
           - "*"
-  agent-{{ .suffix }}:
+  agent:
     clients: []
-  beneficiary-{{ .suffix }}:
+  beneficiary:
     clients: []
 
 job:

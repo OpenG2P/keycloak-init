@@ -7,10 +7,8 @@ metadata:
 data:
   clients.yaml: |
     realms:
-    {{- $suffix := tpl .Values.suffix . }}
-    {{- $ctx := merge (dict "suffix" $suffix) . }}
     {{- range $realmName, $realmDef := .Values.realms }}
-      {{ tpl $realmName $ctx }}:
+      {{ $realmName }}:
         clients:
         {{- if $realmDef.clients }}
         {{- toYaml $realmDef.clients | nindent 8 }}
