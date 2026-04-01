@@ -10,7 +10,7 @@ data:
     {{- range $realmName, $realmDef := .Values.realms }}
       {{ $realmName }}:
         clients:
-        {{- if $realmDef.clients }}
+        {{- if and $realmDef $realmDef.clients }}
         {{- toYaml $realmDef.clients | nindent 8 }}
         {{- else }} []
         {{- end }}

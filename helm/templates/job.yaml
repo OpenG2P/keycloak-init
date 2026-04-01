@@ -43,7 +43,7 @@ spec:
               readOnly: true
             {{- range $realmName, $realmDef := .Values.realms }}
             {{- if $realmDef }}
-            {{- range $realmDef.clients }}
+            {{- range ($realmDef.clients | default list) }}
             - name: secret-{{ .clientId }}
               mountPath: /secrets/{{ .clientId }}
               readOnly: true
@@ -56,7 +56,7 @@ spec:
             name: {{ include "keycloak-init.fullname" . }}-config
         {{- range $realmName, $realmDef := .Values.realms }}
         {{- if $realmDef }}
-        {{- range $realmDef.clients }}
+        {{- range ($realmDef.clients | default list) }}
         - name: secret-{{ .clientId }}
           secret:
             secretName: {{ .clientId }}
