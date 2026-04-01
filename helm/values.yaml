@@ -21,59 +21,45 @@ keycloak:
   existingSecret: "keycloak-admin"
   existingSecretKey: "keycloak-admin-password"
 
-# Define realms and their clients below.
-# If a realm does not exist, it will be created automatically.
-# In the client parameters below, additionally you can define
-#  secret: "optional-secret-value"
-#  If not provided, a random secret is generated and stored in a K8s Secret
-#  (Recommended)
-realms:
-  staff:
-    clients:
-      - clientId: openg2p-sr
-        name: Social Registry
-        redirectUris:
-          - "*"
-      - clientId: openg2p-registry
-        name: Registry
-        redirectUris:
-          - "*"
-      - clientId: openg2p-pbms
-        name: PBMS
-        redirectUris:
-          - "*"
-      - clientId: openg2p-superset
-        name: Superset
-        redirectUris:
-          - "*"
-        clientRoles:
-          - "Admin"
-      - clientId: openg2p-opensearch
-        name: OpenSearch
-        redirectUris:
-          - "*"
-        clientRoles:
-          - "admin"
-      - clientId: openg2p-kafka
-        name: Kafka
-        redirectUris:
-          - "*"
-        clientRoles:
-          - "Admin"
-      - clientId: openg2p-minio
-        name: MinIO
-        redirectUris:
-          - "*"
-        clientRoles:
-          - "consoleAdmin"
-      - clientId: openg2p-odk
-        name: ODK
-        redirectUris:
-          - "*"
-      - clientId: openg2p-spar
-        name: SPAR
-        redirectUris:
-          - "*"
+# Realms and their clients. No defaults — parent/caller chart must define these.
+# If a realm does not exist in Keycloak, it will be created automatically.
+# Existing realms are left untouched. Entire operation is idempotent.
+#
+# Structure:
+#   realms:
+#     <realm-name>:                     # Realm name as key. Created if absent.
+#       clients:
+#         - clientId: <string>          # (required) Unique client identifier
+#           name: <string>              # (optional) Display name. Defaults to clientId
+#           redirectUris:               # (optional) List of redirect URIs. Defaults to ["*"]
+#             - "*"
+#           secret: <string>            # (optional) Client secret. If omitted, auto-generated
+#                                       #   and stored as a K8s Secret (recommended)
+#           clientRoles:                # (optional) List of client roles to create
+#             - <string>                # Simple role (just a name)
+#             - name: <string>          # Composite role
+#               composites:             #   List of child role names contained in this role
+#                 - <string>
+#
+# Example:
+#   realms:
+#     staff:
+#       clients:
+#         - clientId: my-app
+#           name: My Application
+#           redirectUris:
+#             - "*"
+#           clientRoles:
+#             - viewer
+#             - editor
+#             - name: admin
+#               composites:
+#                 - viewer
+#                 - editor
+#     agent:
+#       clients: []
+#
+realms: {}
 job:
   backoffLimit: 3
   ttlSecondsAfterFinished: 600
