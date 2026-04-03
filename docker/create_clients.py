@@ -86,7 +86,8 @@ def configure_themes(base_url, token, realm_name, theme_config):
         return
 
     print(f"Applying themes to realm '{realm_name}': {payload}")
-    requests.put(realm_url, headers=headers, json=payload).raise_for_status()
+    current.update(payload)
+    requests.put(realm_url, headers=headers, json=current).raise_for_status()
     print(f"Themes for realm '{realm_name}' applied successfully.")
 
 def create_client(base_url, realm, token, client_config, client_roles=None):
