@@ -28,6 +28,9 @@ keycloak:
 # Structure:
 #   realms:
 #     <realm-name>:                     # Realm name as key. Created if absent.
+#       themes:                         # (optional) Keycloak themes for this realm
+#         loginTheme: <string>          # (optional) Login page theme name
+#         adminTheme: <string>          # (optional) Admin console theme name
 #       clients:
 #         - clientId: <string>          # (required) Unique client identifier
 #           name: <string>              # (optional) Display name. Defaults to clientId
@@ -43,7 +46,15 @@ keycloak:
 #
 # Example:
 #   realms:
+#     master:
+#       themes:
+#         loginTheme: openg2p-admin
+#         adminTheme: openg2p-admin
+#       clients: []
 #     staff:
+#       themes:
+#         loginTheme: staff-portal
+#         adminTheme: staff-portal
 #       clients:
 #         - clientId: my-app
 #           name: My Application

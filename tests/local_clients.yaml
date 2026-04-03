@@ -1,4 +1,9 @@
 realms:
+  master:
+    themes:
+      loginTheme: keycloak
+      adminTheme: keycloak
+    clients: []
   test-realm:
     clients:
       - clientId: "test-client-local"

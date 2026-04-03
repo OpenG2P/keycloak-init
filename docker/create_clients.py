@@ -53,6 +53,42 @@ def ensure_realm(base_url, token, realm_name):
         return
     response.raise_for_status()
 
+def configure_themes(base_url, token, realm_name, theme_config):
+    """Apply login and/or admin themes to a realm."""
+    if not theme_config:
+        return
+
+    headers = get_headers(token)
+    realm_url = f"{base_url}/admin/realms/{realm_name}"
+
+    payload = {}
+    if 'loginTheme' in theme_config:
+        payload['loginTheme'] = theme_config['loginTheme']
+    if 'adminTheme' in theme_config:
+        payload['adminTheme'] = theme_config['adminTheme']
+
+    if not payload:
+        return
+
+    # Check current themes to avoid unnecessary updates
+    response = requests.get(realm_url, headers=headers)
+    response.raise_for_status()
+    current = response.json()
+
+    needs_update = False
+    for key, value in payload.items():
+        if current.get(key) != value:
+            needs_update = True
+            break
+
+    if not needs_update:
+        print(f"Themes for realm '{realm_name}' already set. Skipping.")
+        return
+
+    print(f"Applying themes to realm '{realm_name}': {payload}")
+    requests.put(realm_url, headers=headers, json=payload).raise_for_status()
+    print(f"Themes for realm '{realm_name}' applied successfully.")
+
 def create_client(base_url, realm, token, client_config, client_roles=None):
     client_id = client_config['clientId']
     print(f"Processing client: {client_id}")
@@ -438,7 +474,11 @@ def main():
         print(f"\n--- Processing realm: {realm_name} ---")
         ensure_realm(KEYCLOAK_URL, token, realm_name)
 
-        clients = realm_def.get('clients', [])
+        # Apply themes if specified
+        themes = realm_def.get('themes') if realm_def else None
+        configure_themes(KEYCLOAK_URL, token, realm_name, themes)
+
+        clients = realm_def.get('clients', []) if realm_def else []
         for client_def in clients:
             # Construct base client config from params
             client_config = {
