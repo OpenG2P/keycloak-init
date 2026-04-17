@@ -2,7 +2,7 @@ apiVersion: v2
 name: keycloak-init
 description: Helm chart to initialize Keycloak clients
 type: application
-version: 1.0.0-develop
+version: 1.0.0
 icon: https://openg2p.github.io/openg2p-helm/openg2p-logo.png
 annotations:
   catalog.cattle.io/display-name: "OpenG2P Keycloak Init"
