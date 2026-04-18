@@ -90,6 +90,136 @@ def configure_themes(base_url, token, realm_name, theme_config):
     requests.put(realm_url, headers=headers, json=current).raise_for_status()
     print(f"Themes for realm '{realm_name}' applied successfully.")
 
+def configure_users(base_url, token, realm_name, users):
+    """Create users and assign roles. Skip if user already exists."""
+    if not users:
+        return
+
+    for user_def in users:
+        username = user_def['username']
+        user_id = ensure_user(base_url, token, realm_name, user_def)
+        if not user_id:
+            continue
+
+        # Assign realm roles
+        realm_roles = user_def.get('realmRoles', [])
+        if realm_roles:
+            assign_realm_roles(base_url, token, realm_name, user_id, realm_roles)
+
+        # Assign client roles
+        client_role_mappings = user_def.get('clientRoleMappings', {})
+        for client_id_name, role_names in client_role_mappings.items():
+            assign_client_roles_to_user(
+                base_url, token, realm_name, user_id, client_id_name, role_names
+            )
+
+def ensure_user(base_url, token, realm_name, user_def):
+    """Create a user if not exists. Returns user ID."""
+    headers = get_headers(token)
+    username = user_def['username']
+    users_url = f"{base_url}/admin/realms/{realm_name}/users"
+
+    # Check if user exists
+    response = requests.get(users_url, headers=headers, params={'username': username, 'exact': 'true'})
+    response.raise_for_status()
+    existing = response.json()
+    if existing:
+        print(f"User '{username}' already exists. Skipping creation.")
+        return existing[0]['id']
+
+    # Create user
+    print(f"Creating user '{username}'...")
+    payload = {
+        "username": username,
+        "email": user_def.get('email', ''),
+        "emailVerified": True,
+        "enabled": True,
+        "credentials": [{
+            "type": "password",
+            "value": user_def['password'],
+            "temporary": True
+        }],
+        "requiredActions": ["UPDATE_PASSWORD"]
+    }
+    response = requests.post(users_url, headers=headers, json=payload)
+    response.raise_for_status()
+
+    # Get user ID from Location header or by querying
+    location = response.headers.get('Location', '')
+    if location:
+        user_id = location.split('/')[-1]
+    else:
+        resp = requests.get(users_url, headers=headers, params={'username': username, 'exact': 'true'})
+        resp.raise_for_status()
+        user_id = resp.json()[0]['id']
+
+    print(f"User '{username}' created successfully.")
+    return user_id
+
+def assign_realm_roles(base_url, token, realm_name, user_id, role_names):
+    """Assign realm-level roles to a user."""
+    headers = get_headers(token)
+    roles_url = f"{base_url}/admin/realms/{realm_name}/roles"
+    mapping_url = f"{base_url}/admin/realms/{realm_name}/users/{user_id}/role-mappings/realm"
+
+    # Get existing realm role assignments
+    response = requests.get(mapping_url, headers=headers)
+    existing_roles = {r['name'] for r in response.json()} if response.status_code == 200 else set()
+
+    roles_to_add = []
+    for role_name in role_names:
+        if role_name in existing_roles:
+            print(f"User already has realm role '{role_name}'. Skipping.")
+            continue
+        resp = requests.get(f"{roles_url}/{role_name}", headers=headers)
+        if resp.status_code == 200:
+            roles_to_add.append(resp.json())
+        else:
+            print(f"Warning: realm role '{role_name}' not found. Skipping.")
+
+    if roles_to_add:
+        print(f"Assigning {len(roles_to_add)} realm role(s)...")
+        requests.post(mapping_url, headers=headers, json=roles_to_add).raise_for_status()
+
+def assign_client_roles_to_user(base_url, token, realm_name, user_id, client_id_name, role_names):
+    """Assign client-level roles to a user."""
+    headers = get_headers(token)
+
+    # Look up client UUID
+    clients_url = f"{base_url}/admin/realms/{realm_name}/clients"
+    response = requests.get(clients_url, headers=headers, params={'clientId': client_id_name})
+    response.raise_for_status()
+    clients = response.json()
+    if not clients:
+        print(f"Warning: client '{client_id_name}' not found. Skipping role assignment.")
+        return
+    client_uuid = clients[0]['id']
+
+    mapping_url = (
+        f"{base_url}/admin/realms/{realm_name}/users/{user_id}"
+        f"/role-mappings/clients/{client_uuid}"
+    )
+
+    # Get existing client role assignments
+    response = requests.get(mapping_url, headers=headers)
+    existing_roles = {r['name'] for r in response.json()} if response.status_code == 200 else set()
+
+    client_roles_url = f"{base_url}/admin/realms/{realm_name}/clients/{client_uuid}/roles"
+    roles_to_add = []
+    for role_name in role_names:
+        if role_name in existing_roles:
+            print(f"User already has client role '{role_name}' on '{client_id_name}'. Skipping.")
+            continue
+        resp = requests.get(f"{client_roles_url}/{role_name}", headers=headers)
+        if resp.status_code == 200:
+            roles_to_add.append(resp.json())
+        else:
+            print(f"Warning: client role '{role_name}' on '{client_id_name}' not found. Skipping.")
+
+    if roles_to_add:
+        print(f"Assigning {len(roles_to_add)} client role(s) from '{client_id_name}'...")
+        requests.post(mapping_url, headers=headers, json=roles_to_add).raise_for_status()
+
 def create_client(base_url, realm, token, client_config, client_roles=None):
     client_id = client_config['clientId']
     print(f"Processing client: {client_id}")
@@ -505,6 +635,10 @@ def main():
 
             client_roles = client_def.get('clientRoles', [])
             create_client(KEYCLOAK_URL, realm_name, token, client_config, client_roles)
+
+        # Create users after clients and roles are in place
+        users = realm_def.get('users', []) if realm_def else []
+        configure_users(KEYCLOAK_URL, token, realm_name, users)
 
 if __name__ == "__main__":
     main()

@@ -2,7 +2,7 @@ image:
   repository: openg2p/keycloak-init
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.0"
+  tag: "develop"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -43,6 +43,15 @@ keycloak:
 #             - name: <string>          # Composite role
 #               composites:             #   List of child role names contained in this role
 #                 - <string>
+#       users:                          # (optional) Users to create in this realm
+#         - username: <string>          # (required) Login username
+#           password: <string>          # (required) Initial password (temporary)
+#           email: <string>             # (optional) Email address
+#           realmRoles:                 # (optional) Realm-level roles to assign
+#             - <string>
+#           clientRoleMappings:         # (optional) Client roles to assign
+#             <clientId>:               #   Key is the client ID
+#               - <string>              #   List of client role names
 #
 # Example:
 #   realms:
@@ -67,6 +76,15 @@ keycloak:
 #               composites:
 #                 - viewer
 #                 - editor
+#       users:
+#         - username: admin@openg2p.org
+#           password: changeme
+#           email: admin@openg2p.org
+#           realmRoles:
+#             - default-roles-staff
+#           clientRoleMappings:
+#             my-app:
+#               - admin
 #     agent:
 #       clients: []
 #

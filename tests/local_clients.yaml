@@ -17,4 +17,11 @@ realms:
             composites:
               - "role-a"
               - "role-b"
-        # secret: "test-secret-123"
+    users:
+      - username: "testuser"
+        password: "changeme"
+        email: "testuser@example.org"
+        clientRoleMappings:
+          test-client-local:
+            - "role-a"
+            - "super-role"
