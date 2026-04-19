@@ -137,6 +137,8 @@ def ensure_user(base_url, token, realm_name, user_def):
     payload = {
         "username": username,
         "email": user_def.get('email', ''),
+        "firstName": user_def.get('firstName', username),
+        "lastName": user_def.get('lastName', ''),
         "emailVerified": True,
         "enabled": True,
         "credentials": [{

@@ -47,6 +47,8 @@ keycloak:
 #         - username: <string>          # (required) Login username
 #           password: <string>          # (required) Initial password (temporary)
 #           email: <string>             # (optional) Email address
+#           firstName: <string>         # (optional) First name. Defaults to username
+#           lastName: <string>          # (optional) Last name. Defaults to empty
 #           realmRoles:                 # (optional) Realm-level roles to assign
 #             - <string>
 #           clientRoleMappings:         # (optional) Client roles to assign
