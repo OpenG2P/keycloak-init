@@ -127,6 +127,11 @@ def ensure_user(base_url, token, realm_name, user_def):
         print(f"User '{username}' already exists. Skipping creation.")
         return existing[0]['id']
 
+    # Cannot create without a password
+    if 'password' not in user_def:
+        print(f"User '{username}' does not exist and no password provided. Skipping.")
+        return None
+
     # Create user
     print(f"Creating user '{username}'...")
     payload = {
