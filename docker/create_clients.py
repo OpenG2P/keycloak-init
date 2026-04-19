@@ -239,7 +239,13 @@ def create_client(base_url, realm, token, client_config, client_roles=None):
     if response.status_code == 200:
         existing_clients = response.json()
         if existing_clients:
-            print(f"Client {client_id} already exists. Skipping...")
+            client_uuid = existing_clients[0]['id']
+            print(f"Client {client_id} already exists.")
+            # Sync secret if one is provided (e.g. from mounted K8s Secret)
+            if 'secret' in client_config:
+                print(f"Updating secret for client {client_id}...")
+                client_url = f"{clients_url}/{client_uuid}"
+                requests.put(client_url, headers=headers, json=client_config).raise_for_status()
             return
         else:
             # Create new
