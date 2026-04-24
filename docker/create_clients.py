@@ -624,28 +624,38 @@ def main():
 
         clients = realm_def.get('clients', []) if realm_def else []
         for client_def in clients:
+            # publicClient defaults to False (Client Authentication: On), preserving
+            # backward compatibility. Set publicClient: true in YAML to disable
+            # client authentication (for SPAs and other browser-only apps).
+            is_public = client_def.get('publicClient', False)
+            # Service accounts require a confidential client; disable for public clients
+            service_accounts_enabled = client_def.get(
+                'serviceAccountsEnabled', not is_public
+            )
+
             # Construct base client config from params
             client_config = {
                 "clientId": client_def['clientId'],
                 "name": client_def.get('name', client_def['clientId']),
                 "protocol": "openid-connect",
-                "publicClient": False, # Client authentication: On
+                "publicClient": is_public, # Client authentication: On (False) / Off (True)
                 "standardFlowEnabled": True, # Standard flow
-                "serviceAccountsEnabled": True, # Service accounts roles
+                "serviceAccountsEnabled": service_accounts_enabled,
                 "directAccessGrantsEnabled": False, # Disable Direct Access Grants
                 "frontchannelLogout": True, # Enable Front Channel Logout
                 "alwaysDisplayInConsole": True, # Always display in UI: On
                 "redirectUris": client_def.get('redirectUris', ['*']),
                 "webOrigins": client_def.get('webOrigins', ['+']),
             }
-            # Check for mounted secret
-            secret_file = f"/secrets/{client_def['clientId']}/client_secret"
-            if os.path.exists(secret_file):
-                print(f"Reading secret from {secret_file}")
-                with open(secret_file, 'r') as f:
-                    client_config['secret'] = f.read().strip()
-            elif 'secret' in client_def:
-                client_config['secret'] = client_def['secret']
+            # Secrets only apply to confidential clients
+            if not is_public:
+                secret_file = f"/secrets/{client_def['clientId']}/client_secret"
+                if os.path.exists(secret_file):
+                    print(f"Reading secret from {secret_file}")
+                    with open(secret_file, 'r') as f:
+                        client_config['secret'] = f.read().strip()
+                elif 'secret' in client_def:
+                    client_config['secret'] = client_def['secret']
 
             client_roles = client_def.get('clientRoles', [])
             create_client(KEYCLOAK_URL, realm_name, token, client_config, client_roles)

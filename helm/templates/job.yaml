@@ -44,10 +44,12 @@ spec:
             {{- range $realmName, $realmDef := .Values.realms }}
             {{- if $realmDef }}
             {{- range ($realmDef.clients | default list) }}
+            {{- if not .publicClient }}
             {{- $clientId := tpl .clientId $ }}
             - name: secret-{{ $clientId }}
               mountPath: /secrets/{{ $clientId }}
               readOnly: true
+            {{- end }}
             {{- end }}
             {{- end }}
             {{- end }}
@@ -58,6 +60,7 @@ spec:
         {{- range $realmName, $realmDef := .Values.realms }}
         {{- if $realmDef }}
         {{- range ($realmDef.clients | default list) }}
+        {{- if not .publicClient }}
         {{- $clientId := tpl .clientId $ }}
         - name: secret-{{ $clientId }}
           secret:
@@ -65,6 +68,7 @@ spec:
             items:
               - key: client_secret
                 path: client_secret
+        {{- end }}
         {{- end }}
         {{- end }}
         {{- end }}

@@ -34,12 +34,14 @@ keycloak:
 #       clients:
 #         - clientId: <string>          # (required) Unique client identifier
 #           name: <string>              # (optional) Display name. Defaults to clientId
+#           publicClient: <bool>        # (optional) Default false (Client Authentication: On).
+#                                       #   Set true for SPAs / browser-only apps (no secret).
 #           redirectUris:               # (optional) List of redirect URIs. Defaults to ["*"]
 #             - "*"
 #           webOrigins:                 # (optional) List of allowed CORS origins. Defaults to ["+"]
 #             - "+"                     #   "+" means use redirectUris as allowed origins
-#           secret: <string>            # (optional) Client secret. If omitted, auto-generated
-#                                       #   and stored as a K8s Secret (recommended)
+#           secret: <string>            # (optional) Client secret (confidential clients only).
+#                                       #   If omitted, auto-generated and stored as K8s Secret
 #           clientRoles:                # (optional) List of client roles to create
 #             - <string>                # Simple role (just a name)
 #             - name: <string>          # Composite role
