@@ -636,6 +636,7 @@ def main():
                 "frontchannelLogout": True, # Enable Front Channel Logout
                 "alwaysDisplayInConsole": True, # Always display in UI: On
                 "redirectUris": client_def.get('redirectUris', ['*']),
+                "webOrigins": client_def.get('webOrigins', ['+']),
             }
             # Check for mounted secret
             secret_file = f"/secrets/{client_def['clientId']}/client_secret"

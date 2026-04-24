@@ -36,6 +36,8 @@ keycloak:
 #           name: <string>              # (optional) Display name. Defaults to clientId
 #           redirectUris:               # (optional) List of redirect URIs. Defaults to ["*"]
 #             - "*"
+#           webOrigins:                 # (optional) List of allowed CORS origins. Defaults to ["+"]
+#             - "+"                     #   "+" means use redirectUris as allowed origins
 #           secret: <string>            # (optional) Client secret. If omitted, auto-generated
 #                                       #   and stored as a K8s Secret (recommended)
 #           clientRoles:                # (optional) List of client roles to create
