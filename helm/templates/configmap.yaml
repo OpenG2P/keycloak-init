@@ -8,18 +8,18 @@ data:
   clients.yaml: |
     realms:
     {{- range $realmName, $realmDef := .Values.realms }}
-      {{ $realmName }}:
+      {{ tpl $realmName $ }}:
         {{- if and $realmDef $realmDef.themes }}
         themes:
-          {{- toYaml $realmDef.themes | nindent 10 }}
+          {{- tpl (toYaml $realmDef.themes) $ | nindent 10 }}
         {{- end }}
         clients:
         {{- if and $realmDef $realmDef.clients }}
-        {{- toYaml $realmDef.clients | nindent 8 }}
+        {{- tpl (toYaml $realmDef.clients) $ | nindent 8 }}
         {{- else }} []
         {{- end }}
         {{- if and $realmDef $realmDef.users }}
         users:
-        {{- toYaml $realmDef.users | nindent 8 }}
+        {{- tpl (toYaml $realmDef.users) $ | nindent 8 }}
         {{- end }}
     {{- end }}
