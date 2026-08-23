@@ -1,3 +1,14 @@
 # Keycloak Client Init
 
-This project provides a Docker-based utility and a Helm chart to automate the creation of Keycloak clients with specific configurations as per OpenG2P requirements. For further details refer to [docs.openg2p.org](https://docs.openg2p.org).
+> [!IMPORTANT]
+> ## This repository has moved to GitLab
+>
+> Active development of **Keycloak Client Init** now happens at
+> **https://gitlab.com/openg2p/keycloak/keycloak-init**
+>
+> This GitHub repository is **read-only**. It is kept for history
+> only — it is no longer built, released, or maintained here, and its contents
+> may be out of date. Please raise issues and merge requests on GitLab.
+>
+> * **Source:** https://gitlab.com/openg2p/keycloak/keycloak-init
+> * **Documentation:** https://docs.openg2p.org
