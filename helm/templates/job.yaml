@@ -1,7 +1,36 @@
+{{- /*
+  Job name = fullname + revision + a hash of everything that shapes the pod
+  template.
+
+  A Job's spec.template is immutable, and this template generates one volume and
+  one volumeMount per confidential client in .Values.realms — so adding a realm
+  or a client changes the pod template. .Release.Revision alone does not
+  distinguish that, because a FAILED install does not advance the revision:
+  retrying it (or reinstalling after an uninstall that left the Job behind)
+  regenerates the same name against a changed template, and the apply fails with
+
+      Job.batch "<name>" is invalid: spec.template: field is immutable
+
+  Helm then fails the whole release, which skips every post-install hook in the
+  parent chart — so unrelated things like database seeding silently never run.
+  One stale Job takes the entire install down.
+
+  Hashing the inputs means a changed template always gets a new name, so the
+  apply cannot conflict. Helm prunes the old Job on the next successful upgrade.
+
+  The 63 is deliberate, not 253: the name is copied into the
+  batch.kubernetes.io/job-name LABEL and label values cap at 63, so a name
+  Kubernetes would accept as a DNS subdomain can still fail Job creation.
+  keycloak-init.fullname already truncates to 63 by itself, leaving no room for
+  the suffix, so the base is trimmed by exactly the suffix length.
+*/ -}}
+{{- $podHash := printf "%s|%s|%s" (toYaml .Values.realms) (toYaml .Values.keycloak) (toYaml .Values.image) | sha256sum | trunc 8 -}}
+{{- $suffix := printf "-%v-%s" .Release.Revision $podHash -}}
+{{- $base := include "keycloak-init.fullname" . | trunc (int (sub 63 (len $suffix))) | trimSuffix "-" -}}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "keycloak-init.fullname" . }}-{{ .Release.Revision }}
+  name: {{ $base }}{{ $suffix }}
   labels:
     {{- include "keycloak-init.labels" . | nindent 4 }}
 spec:
