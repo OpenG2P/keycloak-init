@@ -1,5 +1,5 @@
 image:
-  repository: registry.gitlab.com/openg2p/keycloak/keycloak-init/keycloak-init
+  repository: openg2p/keycloak-init
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "develop"
