@@ -90,6 +90,41 @@ def configure_themes(base_url, token, realm_name, theme_config):
     requests.put(realm_url, headers=headers, json=current).raise_for_status()
     print(f"Themes for realm '{realm_name}' applied successfully.")
 
+def configure_realm_display(base_url, token, realm_name, realm_def):
+    """Set the realm's display name, shown on its login page.
+
+    Keycloak's login screen renders `displayNameHtml` if set, otherwise
+    `displayName`, otherwise the bare realm id. Without this every realm's
+    login page looks identical apart from the URL, which matters as soon as a
+    deployment has more than one (e.g. `staff` and `agent`) sharing a theme.
+    """
+    if not realm_def:
+        return
+
+    payload = {}
+    for key in ('displayName', 'displayNameHtml'):
+        if key in realm_def:
+            payload[key] = realm_def[key]
+
+    if not payload:
+        return
+
+    headers = get_headers(token)
+    realm_url = f"{base_url}/admin/realms/{realm_name}"
+
+    response = requests.get(realm_url, headers=headers)
+    response.raise_for_status()
+    current = response.json()
+
+    if all(current.get(k) == v for k, v in payload.items()):
+        print(f"Display name for realm '{realm_name}' already set. Skipping.")
+        return
+
+    print(f"Applying display name to realm '{realm_name}': {payload}")
+    current.update(payload)
+    requests.put(realm_url, headers=headers, json=current).raise_for_status()
+    print(f"Display name for realm '{realm_name}' applied successfully.")
+
 def configure_users(base_url, token, realm_name, users):
     """Create users and assign roles. Skip if user already exists."""
     if not users:
@@ -621,6 +656,9 @@ def main():
         # Apply themes if specified
         themes = realm_def.get('themes') if realm_def else None
         configure_themes(KEYCLOAK_URL, token, realm_name, themes)
+
+        # Apply the login-page display name if specified
+        configure_realm_display(KEYCLOAK_URL, token, realm_name, realm_def)
 
         clients = realm_def.get('clients', []) if realm_def else []
         for client_def in clients:
